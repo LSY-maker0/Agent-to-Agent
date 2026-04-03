@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>A2A Multi-Agent 数据流向图</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .mermaid {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>A2A Multi-Agent 数据流向图</h1>
+    <p>当输入查机票问题时的数据流向：</p>
+    
+    <div class="mermaid">
+    sequenceDiagram
+        participant User as 用户
+        participant Planner as Planner Agent
+        participant Discovery as A2A Card Resolver
+        participant FlightAgent as 航班查询 Agent (端口 8000)
+        participant FlightExec as FlightSearchAgent
+        participant Result as 结果
+        
+        User->>Planner: 查询上海航班
+        activate Planner
+        Planner->>Discovery: 发现远程 Agent
+        activate Discovery
+        Discovery-->>Planner: 返回航班查询 Agent 信息
+        deactivate Discovery
+        Planner->>Planner: 注册远程工具
+        Planner->>FlightAgent: 调用 flight_search 工具
+        activate FlightAgent
+        FlightAgent->>FlightExec: 执行航班查询
+        activate FlightExec
+        FlightExec-->>FlightAgent: 返回航班数据
+        deactivate FlightExec
+        FlightAgent-->>Planner: 返回查询结果
+        deactivate FlightAgent
+        Planner->>User: 返回最终结果
+        deactivate Planner
+    </div>
+
+    <h2>系统架构图</h2>
+    <div class="mermaid">
+    graph TB
+        subgraph "客户端"
+            A[Planner Agent]
+            B[A2A Client]
+        end
+        
+        subgraph "服务端"
+            C[A2A Server]
+            D[Flight Search Agent<br/>端口 8000]
+            E[Write File Agent<br/>端口 8001]
+        end
+        
+        A -- "发现服务" --> C
+        B -- "调用工具" --> D
+        D -- "执行查询" --> F[(航班数据)]
+        A -- "返回结果" --> G[(最终结果)]
+        
+        style A fill:#e1f5fe
+        style D fill:#f3e5f5
+        style F fill:#e8f5e8
+    </div>
+</body>
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+        }
+    });
+</script>
+</html>
