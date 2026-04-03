@@ -94,7 +94,7 @@ class ToolRegistry:
             return f"未知工具: {name}"
         args = json.loads(arguments)
         print(f"执行工具: {name}，参数: {args}")
-        result =await func('上海')
+        result =await func(args["query"])
         print(f"工具 {name} 执行结果: {result}")
         return result
 
@@ -162,8 +162,9 @@ class PlannerAgent(AgentExecutor):
 
 async def run_a2a_client():
     agent = PlannerAgent()
-    # result = await agent.run("帮我查一下去上海的航班，并把结果写入到 flight_result.md 里")
-    result = await agent.run("帮我查一下去上海的航班")
+    result = await agent.run("帮我查一下去上海的航班，并把结果写入到 flight_result.md 里")
+    # result = await agent.run("帮我查一下去上海的航班")
+    # result = await agent.run("帮我写个hello world到.md")
     print(result)
 
 if __name__ == "__main__":
